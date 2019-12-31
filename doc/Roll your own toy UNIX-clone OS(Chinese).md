@@ -10,7 +10,6 @@
 >
 >注：因为译者水平有限，如有谬误，还望指出，谢谢！
 
-[TOC]
 
 ## 前言
 
@@ -388,7 +387,7 @@ cd ..
 00074621500i[CPU  ] >> jmp .+0xfffffffe (0x00100027) : EBFE
 ```
 
-![genesis_bochs](png\genesis_bochs.png)
+![genesis_bochs](png/genesis_bochs.png)
 
 注意到`EAX`寄存器的值了没？`0xDEADBABA`——`main()`函数的返回值。恭喜你，你现在有一个多兼容的`multiboot`的程序模板了，接下来你要做的是打印一些东西到屏幕上了。
 
@@ -414,7 +413,7 @@ $$
 
 在`ASCII`（文本模式不支持`unicode`编码）编码中，8bit被用来代表一个字符 。而这样我们就有了8bit没用到的位。VGA硬件用他们来指定前景和后景的颜色（每个4bit）。16bit的划分如下图所示：
 
-![the_screen_word_format](png\the_screen_word_format.png)
+![the_screen_word_format](png/the_screen_word_format.png)
 
 4bit位可以表示15种颜色（译者ps：也不知道原作者怎么数的，明明是16位啊喂）：
 
@@ -702,7 +701,7 @@ void monitor_write_dec(u32int n)
 
 函数名应该很好理解—— 如果要检查指针的有效性，确实需要使用十六进制。十进制是可选的，但偶尔看到以10为基数的东西也不错! 
 
-![the_screen_screenshot](png\the_screen_screenshot.png)
+![the_screen_screenshot](png/the_screen_screenshot.png)
 
 你还可以看看linux0.1版本的代码——里面有一个`vsprintf`的实现，非常的整洁。你可以借鉴那个函数，来完成`printf()`函数，这会让你的代码调试起来更加容易。
 
@@ -762,11 +761,11 @@ struct gdt_entry_struct
 typedef struct gdt_entry_struct gdt_entry_t;
 ```
 
-![gdt_idt_gdt_format_2](png\gdt_idt_gdt_format_2.png)
+![gdt_idt_gdt_format_2](png/gdt_idt_gdt_format_2.png)
 
 这些字段中大多数都是不言自明的。访问字节的格式在上面的图中给出，粒度字节的格式在下面给出：
 
-![gdt_idt_gdt_format_1](png\gdt_idt_gdt_format_1.png)
+![gdt_idt_gdt_format_1](png/gdt_idt_gdt_format_1.png)
 
 **P**
 
@@ -983,7 +982,7 @@ extern void isr31();
 
 看见了吗？跟GDT表项和指针结构体非常像。flag字段如下图所示。低5个字节应该恒为`0b0110`——十进制的14。DPL表示期望被调用的特权等级——在我们的实例中是0，但随着我们编程的进展，我们需要把它设置为3。P标志位代表该表项存在。 如果任意描述符这个位为空都将导致“中断未处理”异常。 
 
-![gdt_idt_idt_format_1](png\gdt_idt_idt_format_1.png)
+![gdt_idt_idt_format_1](png/gdt_idt_idt_format_1.png)
 
 #### 4.4.2.descriptor_tables.c
 
@@ -1190,7 +1189,7 @@ asm volatile ("int $0x3");
 asm volatile ("int $0x4");
 ```
 
-![gdt_idt_bochs](png\gdt_idt_bochs.png)
+![gdt_idt_bochs](png/gdt_idt_bochs.png)
 
 在上图中可以看到，产生了两个软件中断：3号中断和4号中断。（译者ps：这里可能是作者截图截错了，正确的应该显示`recieved interrupt:0x3`和`recieved interrupt:0x4`才对，QAQ）
 
@@ -1220,7 +1219,7 @@ asm volatile ("int $0x4");
 
 外部中断背后的低级概念并不是很复杂。所有有中断能力的设备都被连接到PIC（可编程中断控制器）。PIC是唯一与CPU中断引脚直接连接的设备。它被用作多路复用器，并且能在中断设备间划分优先级。它本质上是一个8选1多路复用器。某时某地某人突然觉得8条IRQ线不够用，于是通过菊花链的拓扑方式在原来的多路复用器上又连接了一个。于是在现代计算机中，有2个PICs，主和从，可以服务15个带中断功能的设备（还有一根线用来接收从PIC的信号）。
 
-![pics](png\pics.png)
+![pics](png/pics.png)
 
 PIC的另一个设计得很聪明的地方是，你可以改变传递给每一个IRQ线的中断号。通常称之为PIC的重映射，这很有用。当计算机启动的时候，默认的中断映射为：
 
@@ -1466,7 +1465,7 @@ void init_timer(u32int frequency)
 init_timer(50); // Initialise timer to 50Hz
 ```
 
-![irqs_and_the_pit_bochs](png\irqs_and_the_pit_bochs.png)
+![irqs_and_the_pit_bochs](png/irqs_and_the_pit_bochs.png)
 
 编译，运行！你应该得到和右图一样的输出。但是请注意，bochs并没有准确地模拟计时器芯片，因此，尽管您的代码在真机上能以正确的速度运行，但在bochs中可能不会!
 
@@ -1520,7 +1519,7 @@ start address 0x080482a0
 
 每一个进程通常都有不同的页面映射，这样才能使虚拟内存空间互相独立。在32位x86架构中每页固定为4kb的大小。每一页都有一个相对应的描述符字段，用来告诉处理器它映射到了哪一页框。注意到因为页面和页框都必须以4KB为界限对齐（0x1000字节），Frame adress隐含的最低的12位恒为零。该架构利用这种描述符字段来存储每一页的信息，如是否存在该页、是否是内核态或用户态等等。该字段的组成如下图：
 
-![paging_pte](png\paging_pte.png)
+![paging_pte](png/paging_pte.png)
 
 图中的字段很简单，让我们们迅速过一下。
 
@@ -1558,7 +1557,7 @@ start address 0x080482a0
 
 #### 6.2.2.页目录/页表
 
-![page_directory](png\page_directory.png)
+![page_directory](png/page_directory.png)
 
 可能你已经拿出计算器计算出4GB的地址空间下，每4kb页面使用32bit存储描述符，那大概需要4MB的内存。
 
